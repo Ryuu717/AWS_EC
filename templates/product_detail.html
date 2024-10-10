@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Product Details{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if product %}
+    <div class="row">
+        <div class="col-md-6">
+            <img src="{{ product.ImageUrl }}" class="img-fluid" alt="{{ product.ProductName }}" style="max-height: 500px; width: auto;">
+        </div>
+        <div class="col-md-6">
+            <h2>{{ product.ProductName }}</h2>
+            <p class="card-text text-truncate">{{ product.MerchantName }}</p>
+            <p><strong>Price:</strong> ${{ "%.2f"|format(product.Price) }}</p>
+            <p>{{ product.Description }}</p>
+
+            <!-- Updated form to include ProductName and ImageUrl -->
+            <form action="{{ url_for('add_to_cart') }}" method="POST">
+                <input type="hidden" name="product_id" value="{{ product.ProductID }}">
+                <input type="hidden" name="product_name" value="{{ product.ProductName }}">
+                <input type="hidden" name="image_url" value="{{ product.ImageUrl }}">
+                <input type="hidden" name="price" value="{{ product.Price }}">
+                <input type="hidden" name="merchant_id" value="{{ product.MerchantID }}">
+                <input type="hidden" name="merchant_name" value="{{ product.MerchantName }}">
+                
+                <label for="quantity">Quantity:</label>
+                <input type="number" name="quantity" value="1" class="form-control mb-2" min="1">
+                
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+    {% else %}
+    <p>Product not found.</p>
+    {% endif %}
+</div>
+{% endblock %}

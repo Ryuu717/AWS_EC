@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block title %}Search Results{% endblock %}
+
+{% block content %}
+<h2 class="mt-4">Search Results for "{{ query }}"</h2>
+
+{% if products %}
+    <div class="row">
+        {% for product in products %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <a href="{{ url_for('product_detail', product_id=product.ProductID) }}">
+                    <img src="{{ product.ImageUrl }}" class="img-fluid product-image" alt="{{ product.ProductName }}">
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title text-truncate">{{ product.ProductName }}</h5>
+                    <p class="card-text text-truncate">{{ product.MerchantName }}</p>
+                    <p class="card-text">${{ "%.2f"|format(product.Price) }}</p>
+                    <p class="card-text text-truncate">{{ product.Description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <p class="text-muted">No products found for your search query.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+{% block title %}Your Orders{% endblock %}
+
+{% block content %}
+<h2 class="mt-4">Your Orders</h2>
+
+<div class="container mt-5">
+    {% if orders %}
+        {% for order in orders %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <strong>Order ID: {{ order.OrderID }}</strong>
+                    <span class="float-end">Order Date: {{ order.OrderDate }}</span>
+                </div>
+                <div class="card-body">
+                    <p><strong>Total Amount:</strong> ${{ "%.2f"|format(order.TotalPrice) }}</p>
+                    <table class="table table-striped mt-2">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Product Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Sub Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in order.CartItems %}
+                            <tr>
+                                <td>
+                                    <img src="{{ item.ImageUrl }}" alt="{{ item.ProductName }}" style="width: 80px;">
+                                </td>
+                                <td>{{ item.ProductName }}</td>
+                                <td>{{ "%.f"|format(item.Quantity) }}</td>
+                                <td>${{ "%.2f"|format(item.Price) }}</td>
+                                <td>${{ "%.2f"|format(item.Price * item.Quantity) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>No orders found.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

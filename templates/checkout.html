@@ -1,0 +1,149 @@
+{% extends "layout.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<h2 class="mt-4">Checkout</h2>
+
+<div class="container" style="max-height: 70vh; overflow-y: auto; padding-bottom: 100px;">
+
+  <!-- Display Cart Items -->
+  <h3 class="mt-5">Order Summary</h3>
+  {% if cart_items %}
+  <form action="{{ url_for('update_cart') }}" method="POST">
+    <input type="hidden" class="form-control" id="source" name="source" value="checkout">
+
+      <table class="table table-striped mt-4">
+          <thead>
+              <tr>
+                  <th>Image</th>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Quantity</th>
+                  <th>Total</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for item in cart_items %}
+              <tr class="align-middle">  <!-- Add align-middle class for vertical alignment -->
+                  <!-- Display Product Image -->
+                  <td class="align-middle">
+                      <img src="{{ item.ImageUrl }}" alt="{{ item.ProductName }}" style="width: 80px; height: auto;">
+                  </td>
+  
+                  <!-- Display Product Name -->
+                  <td class="align-middle">{{ item.ProductName }}</td>
+  
+                  <!-- Display Price -->
+                  <td class="align-middle">${{ "%.2f"|format(item.Price) }}</td>
+  
+                  <!-- Display Quantity -->
+                  <td class="align-middle">
+                      <input type="number" name="quantities[{{ item.ProductID }}]" value="{{ item.Quantity }}" min="1" class="form-control" style="width: 80px;">
+                  </td>
+  
+                  <!-- Display Total -->
+                  <td class="align-middle">${{ "%.2f"|format(item.Price * item.Quantity) }}</td>
+  
+                  <!-- Display Remove Button with Trash Icon -->
+                  <td class="align-middle">
+                      <a href="{{ url_for('remove_from_checkout', product_id=item.ProductID) }}" class="btn btn-danger">
+                          <i class="fas fa-trash"></i>
+                      </a>
+                  </td>
+              </tr>
+              {% endfor %}
+          </tbody>
+      </table>
+  
+      <!-- Align Update Cart button to the bottom right -->
+      <div class="d-flex justify-content-end">
+          <button type="submit" class="btn btn-primary">Update Cart</button>
+      </div>
+  </form>
+
+
+  
+  <!-- Display User Information Section -->
+  <div class="billing-info mt-5 d-flex justify-content-between">
+      <h3>Billing Information</h3>
+      <!-- Edit link next to Billing Information title -->
+      <a href="#" class="btn btn-link" data-bs-toggle="modal" data-bs-target="#billingModal">Edit</a>
+  </div>
+  <p><strong>Name:</strong> {{ user_info.get('Username', '') }}</p>
+  <p><strong>Email:</strong> {{ user_info.get('Email', '') }}</p>
+  <p><strong>Address:</strong> {{ user_info.get('Address', '') }}</p>
+  <p><strong>Payment Method:</strong> {{ user_info.get('PaymentMethod', '') }}</p>
+
+  <!-- Modal to Update Billing Information -->
+  <div class="modal fade" id="billingModal" tabindex="-1" aria-labelledby="billingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{{ url_for('update_account') }}" method="POST">
+          <div class="modal-header">
+            <h5 class="modal-title" id="billingModalLabel">Update Billing Information</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <input type="hidden" class="form-control" id="source" name="source" value="checkout">
+              <div class="form-group">
+                  <label for="name">Name</label>
+                  <input type="text" class="form-control" id="name" name="name" value="{{ user_info.get('Username', '') }}" required>
+              </div>
+              <div class="form-group">
+                  <label for="email">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" value="{{ user_info.get('Email', '') }}" required>
+              </div>
+              <div class="form-group">
+                  <label for="address">Address</label>
+                  <input type="text" class="form-control" id="address" name="address" value="{{ user_info.get('Address', '') }}" required>
+              </div>
+              <div class="form-group">
+                  <label for="payment_method">Payment Method</label>
+                  <input type="text" class="form-control" id="payment_method" name="payment_method" value="{{ user_info.get('PaymentMethod', '') }}" required>
+              </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<!-- Shipping Information -->
+<h3 class="mt-4">Shipping Address</h3>
+<div class="form-group">
+    <p>{{ user_info.get('Address', '') }}</p>
+</div>
+  
+<!-- Discounts and Promotions -->
+<h3 class="mt-4">Discounts and Promotions</h3>
+<div class="form-group">
+    <label for="promo_code">Promo Code</label>
+    <input type="text" id="promo_code" name="promo_code" class="form-control" placeholder="Enter promo code (if any)">
+</div>
+  
+<!-- Payment and Confirmation -->
+<h3 class="mt-4">Terms and Confirmation</h3>
+<div class="form-check">
+    <input type="checkbox" class="form-check-input" required>
+    <!-- <label class="form-check-label">I agree to the <a href="#">terms and conditions</a>.</label> -->
+    <label class="form-check-label">I agree to the terms and conditions.</label>
+</div>
+  
+<!-- Fixed Footer with Total Price and Confirm Payment -->
+<div class="fixed-bottom bg-light p-3 d-flex justify-content-end align-items-center">
+    <h4 class="me-3">Total: ${{ "%.2f"|format(total_price) }}</h4>
+    <form action="{{ url_for('checkout') }}" method="POST">
+        <input type="hidden" name="order_id" value="order001">
+        <input type="hidden" name="amount" value="{{ total_price }}">
+        <input type="hidden" name="payment_method" value="{{ user_info.get('PaymentMethod', '') }}">
+        <button type="submit" class="btn btn-success">Confirm Payment</button>
+    </form>
+</div>
+
+{% else %}
+<p>Your cart is empty. <a href="{{ url_for('products') }}">Shop now!</a></p>
+{% endif %}
+{% endblock %}

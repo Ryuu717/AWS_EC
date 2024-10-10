@@ -1,0 +1,49 @@
+<!-- navbar.html -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid d-flex align-items-center">
+        <!-- Left: Logo and Title -->
+        <a class="navbar-brand d-flex align-items-center" href="{{ url_for('products') }}">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo" width="40" height="40" class="d-inline-block align-text-top">
+            <span class="ms-2">E-Commerce</span>
+        </a>
+
+        <!-- Center: Search Bar -->
+        <form class="d-flex mx-auto align-items-center" action="{{ url_for('search') }}" method="GET">
+            <input id="search-box" class="form-control me-2" type="search" placeholder="Search products" aria-label="Search" name="query">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+
+        <!-- Right: Page Links with User Dropdown -->
+        <ul class="navbar-nav ms-auto d-flex align-items-center">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('products') }}">Products</a></li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('cart') }}">
+                    {% if cart_items_quantity > 0 %}
+                        Cart <span class="badge bg-danger mx-2">{{ cart_items_quantity }}</span>
+                    {% else %}
+                        Cart <span class=" mx-2"></span>
+                    {% endif %}
+                </a>
+            </li>
+
+            {% if 'user_name' in session %}
+            <!-- Dropdown for logged-in user -->
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Hello, {{ session['user_name'] }}!
+                </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                    <li><a class="dropdown-item" href="{{ url_for('account') }}">Account</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('orders') }}">Orders</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="{{ url_for('logout') }}">Logout</a></li>
+                </ul>
+            </li>
+            {% else %}
+            <!-- Login/Register links for users who are not logged in -->
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</nav>
